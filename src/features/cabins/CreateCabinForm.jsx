@@ -15,7 +15,6 @@ function CreateCabinForm() {
   const { register, handleSubmit, reset, getValues, formState } = useForm();
 
   const { errors } = formState;
-  console.log(errors);
 
   const { mutate, isLoading: isCreating } = useMutation({
     mutationFn: createCabin,
@@ -30,7 +29,7 @@ function CreateCabinForm() {
   });
 
   function onSubmit(data) {
-    mutate(data);
+    mutate({ ...data, image: data.image[0] });
   }
 
   function onError(errors) {}
@@ -41,6 +40,7 @@ function CreateCabinForm() {
         <Input
           type="text"
           id="name"
+          disabled={isCreating}
           {...register("name", {
             required: "The name field is required!",
           })}
@@ -51,6 +51,7 @@ function CreateCabinForm() {
         <Input
           type="number"
           id="maxCapacity"
+          disabled={isCreating}
           {...register("maxCapacity", {
             required: "The maxCapacity field is required!",
             min: {
@@ -65,6 +66,7 @@ function CreateCabinForm() {
         <Input
           type="number"
           id="regularPrice"
+          disabled={isCreating}
           {...register("regularPrice", {
             required: "The regularPrice field is required!",
             min: {
@@ -79,6 +81,7 @@ function CreateCabinForm() {
         <Input
           type="number"
           id="discount"
+          disabled={isCreating}
           defaultValue={0}
           {...register("discount", {
             required: "The discount field is required!",
@@ -96,6 +99,7 @@ function CreateCabinForm() {
         <Textarea
           type="number"
           id="description"
+          disabled={isCreating}
           defaultValue=""
           {...register("description", {
             required: "The description field is required!",
@@ -104,7 +108,13 @@ function CreateCabinForm() {
       </FormRow>
 
       <FormRow label="Cabin photo">
-        <FileInput id="image" accept="image/*" />
+        <FileInput
+          id="image"
+          accept="image/*"
+          {...register("image", {
+            required: "The image field is required!",
+          })}
+        />
       </FormRow>
 
       <FormRow>
