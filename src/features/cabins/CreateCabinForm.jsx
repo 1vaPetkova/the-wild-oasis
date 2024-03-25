@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createEditCabin } from "../../services/apiCabins";
-import { toast } from "react-hot-toast";
+
+import { useCreateCabin } from "./useCreateCabin";
+import { useEditCabin } from "./useEditCabin";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
@@ -21,31 +21,8 @@ function CreateCabinForm({ cabinToEdit = {} }) {
 
   const { errors } = formState;
 
-  const queryClient = useQueryClient();
-
-  const { mutate: createCabin, isLoading: isCreating } = useMutation({
-    mutationFn: createEditCabin,
-    onSuccess: () => {
-      toast.success("New cabin successfully created");
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      reset();
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
-
-  const { mutate: editCabin, isLoading: isEditing } = useMutation({
-    mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
-    onSuccess: () => {
-      toast.success("Cabin was successfully updated");
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      reset();
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+  const { isCreating, createCabin } = useCreateCabin();
+  const { isEditing, editCabin } = useEditCabin();
 
   const isWorking = isCreating || isEditing;
   function onSubmit(data) {
@@ -53,7 +30,12 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     if (isEditSession) {
       editCabin({ newCabinData: { ...data, image: image }, id: editId });
     } else {
-      createCabin({ ...data, image: image });
+      createCabin(
+        { ...data, image: image },
+        {
+          onSuccess: (data) => reset(),
+        }
+      );
     }
   }
 
@@ -124,7 +106,6 @@ function CreateCabinForm({ cabinToEdit = {} }) {
         <Textarea
           type="number"
           id="description"
-          disabled={isWorking}
           defaultValue=""
           {...register("description", {
             required: "The description field is required!",
