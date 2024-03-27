@@ -3,6 +3,8 @@ import { formatCurrency } from "../../utils/helpers";
 import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
+import { useCreateCabin } from "./useCreateCabin";
+import Button from "../../ui/Button";
 
 const TableRow = styled.div`
   display: grid;
@@ -32,6 +34,11 @@ const Cabin = styled.div`
   font-family: "Sono";
 `;
 
+const Actions = styled.div`
+  display: inline-flex;
+  gap: 2px;
+`;
+
 const Price = styled.div`
   font-family: "Sono";
   font-weight: 600;
@@ -52,10 +59,22 @@ function CabinRow({ cabin }) {
     regularPrice,
     discount,
     image,
+    description,
   } = cabin;
 
+  const { isCreating, createCabin } = useCreateCabin();
   const { isDeleting, deleteCabin } = useDeleteCabin();
 
+  function handleDuplicate() {
+    createCabin({
+      name: `Copy of ${name}`,
+      maxCapacity,
+      regularPrice,
+      discount,
+      image,
+      description,
+    });
+  }
   return (
     <>
       <TableRow role="row">
@@ -68,12 +87,15 @@ function CabinRow({ cabin }) {
         ) : (
           <span>&mdash;</span>
         )}
-        <div>
-          <button onClick={() => setShowForm((show) => !show)}>Edit</button>
-          <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
-            Delete
-          </button>
-        </div>
+        <Actions>
+          <Button disabled={isCreating} onClick={handleDuplicate}>
+            📃
+          </Button>
+          <Button onClick={() => setShowForm((show) => !show)}>✏️</Button>
+          <Button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
+            🗑️
+          </Button>
+        </Actions>
       </TableRow>
       {showForm && <CreateCabinForm cabinToEdit={cabin} />}
     </>

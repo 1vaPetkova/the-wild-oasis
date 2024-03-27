@@ -4,8 +4,8 @@ import CabinRow from "./CabinRow";
 import { useCabins } from "./useCabins";
 
 const Table = styled.div`
+  display: grid;
   border: 1px solid var(--color-grey-200);
-
   font-size: 1.4rem;
   background-color: var(--color-grey-0);
   border-radius: 7px;
@@ -34,10 +34,12 @@ function CabinTable() {
   return (
     <Table role="table">
       <TableHeader role="row">
+        <div>Image</div>
         <div>Cabin</div>
         <div>Capacity</div>
         <div>Price</div>
         <div>Discount</div>
+        <div>Actions</div>
       </TableHeader>
       {cabins.map((cabin) => (
         <CabinRow cabin={cabin} key={cabin.id} />
